@@ -1,0 +1,22 @@
+index.html
+<h3>¡Conseguí 20 puntos para ganar!</h3>
+
+<button onclick="sumar()">¡TOCAME!</button>
+
+<h2 id="mensaje"></h2>
+
+<script>
+let puntos = 0;
+
+function sumar() {
+    puntos++;
+    document.getElementById("puntos").innerText = puntos;
+
+    if (puntos >= 20) {
+        document.getElementById("mensaje").innerText = "¡GANASTE! 🏆";
+    }
+}
+</script>
+
+</body>
+</html>
