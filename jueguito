@@ -1,22 +1,106 @@
-index.html
-<h3>¡Conseguí 20 puntos para ganar!</h3>
 
-<button onclick="sumar()">¡TOCAME!</button>
-
-<h2 id="mensaje"></h2>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi juego 2D</title>
+<style>
+body {
+  margin: 0;
+  background: #17243b;
+  color: white;
+  text-align: center;
+  font-family: Arial;
+}
+h1 { color: #ffe66d; }
+canvas {
+  background: linear-gradient(#70c5ff, #d8f5ff);
+  border: 4px solid white;
+  max-width: 95%;
+}
+</style>
+</head>
+<body>
+<h1>¡MI AVENTURA 2D!</h1>
+<h3>Puntos: <span id="puntos">0</span></h3>
+<canvas id="juego" width="800" height="400"></canvas>
+<p>Usá ← → para moverte y ESPACIO para saltar.</p>
 
 <script>
+const canvas = document.getElementById("juego");
+const ctx = canvas.getContext("2d");
+
+let jugador = {
+  x: 60, y: 300, w: 35, h: 45,
+  vy: 0, suelo: true
+};
+
+let obstaculo = { x: 800, y: 345, w: 30, h: 35 };
 let puntos = 0;
+let teclas = {};
 
-function sumar() {
+document.addEventListener("keydown", e => {
+  teclas[e.code] = true;
+  if (e.code === "Space") e.preventDefault();
+});
+document.addEventListener("keyup", e => {
+  teclas[e.code] = false;
+});
+
+function dibujar() {
+  ctx.clearRect(0, 0, 800, 400);
+
+  ctx.fillStyle = "#38a34a";
+  ctx.fillRect(0, 370, 800, 30);
+
+  if (teclas["ArrowRight"]) jugador.x += 4;
+  if (teclas["ArrowLeft"]) jugador.x -= 4;
+
+  if (teclas["Space"] && jugador.suelo) {
+    jugador.vy = -12;
+    jugador.suelo = false;
+  }
+
+  jugador.vy += 0.6;
+  jugador.y += jugador.vy;
+
+  if (jugador.y + jugador.h >= 370) {
+    jugador.y = 370 - jugador.h;
+    jugador.vy = 0;
+    jugador.suelo = true;
+  }
+
+  jugador.x = Math.max(0, Math.min(765, jugador.x));
+
+  ctx.fillStyle = "#ff4545";
+  ctx.fillRect(jugador.x, jugador.y, jugador.w, jugador.h);
+
+  obstaculo.x -= 5;
+
+  if (obstaculo.x < -30) {
+    obstaculo.x = 800;
     puntos++;
-    document.getElementById("puntos").innerText = puntos;
+    document.getElementById("puntos").textContent = puntos;
+  }
 
-    if (puntos >= 20) {
-        document.getElementById("mensaje").innerText = "¡GANASTE! 🏆";
-    }
+  ctx.fillStyle = "#333";
+  ctx.fillRect(obstaculo.x, obstaculo.y, obstaculo.w, obstaculo.h);
+
+  if (
+    jugador.x < obstaculo.x + obstaculo.w &&
+    jugador.x + jugador.w > obstaculo.x &&
+    jugador.y + jugador.h > obstaculo.y
+  ) {
+    alert("¡Perdiste! Puntos: " + puntos);
+    location.reload();
+    return;
+  }
+
+  requestAnimationFrame(dibujar);
 }
-</script>
 
+dibujar();
+</script>
 </body>
 </html>
